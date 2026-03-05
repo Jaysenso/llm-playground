@@ -1,0 +1,47 @@
+# Environment
+.env
+.env.local
+.env*.local
+**/.env
+**/.env.local
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.uv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+**/node_modules/
+.cache/
+
+# Vite / TanStack Router (generated)
+frontend/src/routeTree.gen.ts
+
+# Build output
+frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+
+# Claude
+.claude/

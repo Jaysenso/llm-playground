@@ -3,15 +3,18 @@ const BASE_URL = import.meta.env.VITE_API_URL
 export async function apiStream(
   endpoint: string,
   options?: RequestInit,
+  onMeta?: (meta: { modelName: string }) => void,
   onChunk?: (chunk: string) => void,
-  onDone?: () => void,
-  onError?: (err: Error) => void,
+  signal?: AbortSignal,
 ) {
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       headers: { 'Content-Type': 'application/json' },
+      signal,
       ...options,
     })
+    const modelName = response.headers.get('x-model-name')
+    if (modelName) onMeta?.({ modelName })
 
     if (!response.ok) throw new Error(await response.text())
 
@@ -26,10 +29,7 @@ export async function apiStream(
 
       onChunk?.(decoder.decode(value))
     }
-
-    onDone?.()
   } catch (err) {
     console.error(`apiStream failed [${endpoint}]:`, err)
-    onError?.(err instanceof Error ? err : new Error(String(err)))
   }
 }

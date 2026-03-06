@@ -124,6 +124,29 @@
   }
 }
 
+/* Webkit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--chat-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--chat-surface);
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--chat-muted);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--chat-surface) var(--chat-bg);
+}
 /* ── Claude chat theme ─────────────────────────────────── */
 :root {
   --chat-bg: #202020;

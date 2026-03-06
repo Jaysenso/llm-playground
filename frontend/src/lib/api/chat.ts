@@ -11,8 +11,8 @@ export const chatApi = {
   stream: (
     message: Message[],
     onChunk: (chunk: string) => void,
-    onDone?: () => void,
-    onError?: () => void,
+    onMeta?: (meta: { modelName: string }) => void,
+    signal?: AbortSignal,
   ) =>
     apiStream(
       '/api/v1/chat',
@@ -20,8 +20,8 @@ export const chatApi = {
         method: 'POST',
         body: JSON.stringify(message),
       },
+      onMeta,
       onChunk,
-      onDone,
-      onError,
+      signal,
     ),
 }

@@ -12,8 +12,8 @@ const SUGGESTIONS = [
     prompt: 'Give me 5 unique project ideas for a weekend build',
   },
   {
-    label: 'Improve my writing',
-    prompt: 'Help me make this more compelling: ',
+    label: 'Tell me a Joke',
+    prompt: 'Tell me a joke in less than 50words',
   },
 ]
 

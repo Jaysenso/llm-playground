@@ -7,7 +7,11 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from '@/components/ui/prompt-input'
-
+import {
+  ChatContainerContent,
+  ChatContainerRoot,
+} from '@/components/ui/chat-container'
+import { ScrollButton } from '@/components/ui/scroll-button'
 import { chatApi } from '#/lib/api/chat'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,6 +29,7 @@ export const Route = createFileRoute('/chat/')({
 /* ── Main Chat component ────────────────────────────────── */
 function Chat() {
   const [messages, setMessages] = useState<Message[]>([])
+  const [modelName, setModelName] = useState<string>('')
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [files, setFiles] = useState<File[]>([])
@@ -67,12 +72,16 @@ function Chat() {
     abortRef.current = controller
 
     try {
-      await chatApi.stream(updatedMessages, (chunk) =>
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId ? { ...m, content: m.content + chunk } : m,
+      await chatApi.stream(
+        updatedMessages,
+        (chunk) =>
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId ? { ...m, content: m.content + chunk } : m,
+            ),
           ),
-        ),
+        ({ modelName }) => setModelName(modelName),
+        controller.signal,
       )
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
@@ -97,6 +106,12 @@ function Chat() {
     }
   }, [input, files, isLoading])
 
+  const abortGeneration = () => {
+    abortRef.current?.abort()
+    const lastUserMessage =
+      messages.findLast((m) => m.role === 'user')?.content ?? ''
+    setInput(lastUserMessage)
+  }
   const handleNewChat = () => {
     abortRef.current?.abort()
     setMessages([])
@@ -126,25 +141,33 @@ function Chat() {
       <Header handleNewChat={handleNewChat} />
 
       {/* ── Messages area ── */}
-      <div className="flex-1 overflow-y-auto flex flex-col">
-        {messages.length === 0 ? (
+      {messages.length === 0 ? (
+        <div className="flex-1 min-h-0 flex items-center justify-center">
           <WelcomeScreen onSuggestion={setInput} />
-        ) : (
-          <div className="max-w-240 mx-auto w-full px-6 pt-10 pb-4">
-            {messages.map((msg) =>
-              msg.role === 'user' ? (
-                <UserMessage key={msg.id} content={msg.content} />
-              ) : (
-                <AssistantMessage
-                  key={msg.id}
-                  content={msg.content}
-                  isStreaming={msg.isStreaming}
-                />
-              ),
-            )}
+        </div>
+      ) : (
+        <ChatContainerRoot className="flex-1 min-h-0 relative">
+          <ChatContainerContent className="space-y-4 p-4">
+            <div className="max-w-240 mx-auto w-full px-6 pt-10 pb-4">
+              {messages.map((msg) =>
+                msg.role === 'user' ? (
+                  <UserMessage key={msg.id} content={msg.content} />
+                ) : (
+                  <AssistantMessage
+                    key={msg.id}
+                    modelName={modelName}
+                    content={msg.content}
+                    isStreaming={msg.isStreaming}
+                  />
+                ),
+              )}
+            </div>
+          </ChatContainerContent>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
+            <ScrollButton className="shadow-lg bg-background dark:bg-muted" />
           </div>
-        )}
-      </div>
+        </ChatContainerRoot>
+      )}
 
       {/* ── Input area ── */}
       <div className="shrink-0 px-4 pb-4 pt-2 max-w-178 mx-auto w-full">
@@ -198,27 +221,32 @@ function Chat() {
             <PromptInputAction
               tooltip={isLoading ? 'Stop generation' : 'Send message'}
             >
-              <Button
-                variant="default"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={handleSubmit}
-                disabled={!canSend && !isLoading}
-              >
-                {canSend ? (
-                  isLoading ? (
-                    <Square className="size-5 fill-current" />
-                  ) : (
-                    <ArrowUp className="size-5" />
-                  )
-                ) : (
-                  <ArrowUp className="size-5 opacity-50" />
-                )}
-              </Button>
+              {/* ── Send Message & Abort Generation Button ── */}
+              {isLoading ? (
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={abortGeneration}
+                >
+                  <Square className="size-3 fill-current" />
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={handleSubmit}
+                  disabled={!canSend}
+                >
+                  <ArrowUp className="size-4" strokeWidth={4} />
+                </Button>
+              )}
             </PromptInputAction>
           </PromptInputActions>
         </PromptInput>
 
+        {/* ── Footer Message ── */}
         <p className="text-center text-[11px] text-(--chat-muted) font-body mt-2 opacity-65">
           LLM can make mistakes. Consider checking important information.
         </p>

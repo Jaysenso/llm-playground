@@ -1,6 +1,6 @@
 {
-  "short_name": "TanStack App",
-  "name": "Create TanStack App Sample",
+  "short_name": "llm-playground",
+  "name": "LLM Playground",
   "icons": [
     {
       "src": "favicon.ico",

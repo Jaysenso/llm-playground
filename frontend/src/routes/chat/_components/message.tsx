@@ -1,10 +1,11 @@
 import { Markdown } from '@/components/ui/markdown'
 import { customComponents } from './markdown-style'
+import { Bot } from 'lucide-react'
 
 /* ── Typing indicator ───────────────────────────────────── */
 function TypingDots() {
   return (
-    <div className="flex items-center gap-1.25 py-1">
+    <div className="flex items-center gap-1.25 py-6 pt-6">
       {[0, 1, 2].map((i) => (
         <span
           key={i}
@@ -28,21 +29,28 @@ export function UserMessage({ content }: { content: string }) {
 }
 
 export function AssistantMessage({
+  modelName,
   content,
   isStreaming,
 }: {
+  modelName: string
   content: string
   isStreaming?: boolean
 }) {
   return (
-    <div className="flex gap-3 mb-7 animate-[msgIn_0.2s_ease-out]">
-      {/* Avatar */}
-      <div className="shrink-0 mt-0.2">
-        <div className="size-6 rounded-lg bg-(--chat-accent) flex items-center justify-center" />
+    <div className="flex flex-col gap-1 mb-7 animate-[msgIn_0.2s_ease-out]">
+      {/* Avatar + Model name */}
+      <div className="flex items-center gap-2">
+        <div className="size-8 rounded-lg bg-(--chat-accent) flex items-center justify-center shrink-0">
+          <Bot className="size-4 text-white" />
+        </div>
+        <span className="text-xs text-muted-foreground font-medium">
+          {modelName ? modelName : 'Unknown Model'}
+        </span>
       </div>
 
-      {/* Text */}
-      <div className="flex-1 font-body text-sm leading-7 text-(--chat-text) pt-0.5 wrap-break-word">
+      {/* Message content */}
+      <div className="font-body text-sm leading-7 text-(--chat-text) wrap-break-word">
         {!content && isStreaming ? (
           <TypingDots />
         ) : (

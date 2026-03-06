@@ -20,22 +20,27 @@ class OpenRouterClient(LLMClient):
         system_prompt: str,
         messages: list[Message],
     ) ->  AsyncIterator[str]:  
-        
-        response = await self.client.chat.completions.create(
-            model=self.model_name,
-            messages=cast(list[ChatCompletionMessageParam], [
-                {'role': m.role, 'content': m.content} for m in messages]),
-            stream=True
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model_name,
+                messages=cast(list[ChatCompletionMessageParam],           
+                    [
+                        {'role': 'system', 'content': system_prompt},
+                        *[{'role': m.role, 'content': m.content} for m in messages]
+                    ]),
+                stream=True
+            )
 
-        async for chunk in response:
-            if not chunk.choices:
-                continue
+            async for chunk in response:
+                if not chunk.choices:
+                    continue
             
-            content = chunk.choices[0].delta.content
-            if content is not None:
-                yield content
-    
+                content = chunk.choices[0].delta.content
+                if content is not None:
+                    yield content
+                    
+        except RuntimeError as e:
+            raise RuntimeError(f"Ollama stream completion failed: {e}") from e
 
             
         

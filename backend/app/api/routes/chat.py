@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -8,14 +8,20 @@ from app.core.types import Message
 
 class ChatResponse(BaseModel):
     content: str
-   
+
 router = APIRouter(prefix="/chat", tags=['chat'])
 
 @router.post("")
-async def chat(request: list[Message]):
-    
+async def chat(http_request: Request, request: list[Message]):
+
+    async def stream_with_disconnect_check():
+        async for chunk in chat_service.stream_reply(messages=request):
+            if await http_request.is_disconnected():
+                break
+            yield chunk
+
     return StreamingResponse(
-            chat_service.stream_reply(messages=request),
+            stream_with_disconnect_check(),
             media_type="text/plain",
             headers={
                 "X-Model-Name": app_config.MODEL_NAME,

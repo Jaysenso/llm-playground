@@ -40,7 +40,7 @@ class OpenRouterClient(LLMClient):
                     yield content
                     
         except RuntimeError as e:
-            raise RuntimeError(f"Ollama stream completion failed: {e}") from e
+            raise RuntimeError(f"OpenRouter stream completion failed: {e}") from e
 
             
         

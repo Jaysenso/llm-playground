@@ -1,12 +1,8 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from openai.types.chat import ChatCompletionMessageParam
 from contextlib import asynccontextmanager
-from pydantic import BaseModel
 
 from app.core.logger import logger
-from app.api.services.chat_service import chat_service
 from app.api.v1.api import api_router
 
    

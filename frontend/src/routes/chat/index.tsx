@@ -12,7 +12,6 @@ import {
   ChatContainerRoot,
 } from '@/components/ui/chat-container'
 import { ScrollButton } from '@/components/ui/scroll-button'
-import { chatApi } from '#/lib/api/chat'
 import { Button } from '@/components/ui/button'
 import {
   WelcomeScreen,
@@ -21,6 +20,7 @@ import {
   UserMessage,
 } from './_components'
 import type { Message } from '@/types'
+import { chatApi } from '#/lib/api/chat'
 
 export const Route = createFileRoute('/chat/')({
   component: Chat,

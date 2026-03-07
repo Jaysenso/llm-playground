@@ -1,6 +1,6 @@
-# LLM App
+# LLM Playground
 
-A fullstack LLM chat application with a Python FastAPI backend and React/TypeScript frontend. Supports streaming responses via [OpenRouter](https://openrouter.ai/) or a local [Ollama](https://ollama.com/) instance. Includes **Codeflow** — an interactive call graph visualizer powered by Cytoscape.js.
+A collection of LLM-powered tools built with a Python FastAPI backend and React/TypeScript frontend.
 
 ---
 
